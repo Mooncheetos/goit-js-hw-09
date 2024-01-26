@@ -1,3 +1,8 @@
+// Описаний в документації
+import SimpleLightbox from "simplelightbox";
+// Додатковий імпорт стилів
+import "simplelightbox/dist/simple-lightbox.min.css";
+
 const images = [
 {
 preview:
@@ -65,60 +70,20 @@ description: "Lighthouse Coast Sea",
 ];
 
 const galleryContainer = document.querySelector('.gallery');
-let lightboxInstance = null;
+const imagesMarkup = generateGalleryMarkup(images);
+galleryContainer.innerHTML = imagesMarkup;
+const lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: 'alt',
+    captionDelay: 250,
+    overlayOpacity: 0.9,
+});
 
 function generateGalleryMarkup(imagesArray) {
-return imagesArray.map(({ preview, original, description }) => `
-<li class="gallery-item">
-    <a class="gallery-link" href="${original}">
-        <img class="gallery-image" src="${preview}" data-source="${original}" alt="${description}" />
-    </a>
-</li>
-`).join('');
+    return imagesArray.map(({ preview, original, description }) => `
+        <li class="gallery-item">
+            <a class="gallery-link" href="${original}">
+                <img class="gallery-image" src="${preview}" data-source="${original}" alt="${description}" />
+            </a>
+        </li>
+    `).join('');
 }
-
-function initializeLightbox() {
-lightboxInstance = basicLightbox.create('<img src="" width="800" height="600">', {
-onShow: () => {
-document.addEventListener('keydown', onKeydown);
-},
-onClose: () => {
-document.removeEventListener('keydown', onKeydown);
-}
-});
-}
-
-function updateLightboxContent(imageSrc) {
-lightboxInstance.element().querySelector('img').src = imageSrc;
-}
-
-function openLightbox() {
-lightboxInstance.show();
-}
-
-function onGalleryClick(event) {
-event.preventDefault();
-
-if (event.target.nodeName !== 'IMG') {
-return;
-}
-
-const imageSrc = event.target.dataset.source;
-
-if (!lightboxInstance) {
-initializeLightbox();
-}
-
-updateLightboxContent(imageSrc);
-openLightbox();
-}
-
-function onKeydown(event) {
-if (event.key === 'Escape' && lightboxInstance) {
-lightboxInstance.close();
-}
-}
-
-galleryContainer.innerHTML = generateGalleryMarkup(images);
-
-galleryContainer.addEventListener('click', onGalleryClick);
